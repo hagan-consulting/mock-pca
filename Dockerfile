@@ -28,7 +28,7 @@ COPY internal/ internal/
 RUN go build -ldflags=-buildid= -o /out/ ./cmd/mockpca-lint ./cmd/mockpca-serve
 
 # debian:trixie-slim as of 2026-10-20 (repo-info 8561b0da).
-FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad
+FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
 LABEL org.opencontainers.image.title="mock-pca" \
       org.opencontainers.image.description="Development-only mock of the NG9-1-1 PCA PKI. NOT FOR PRODUCTION." \
       org.opencontainers.image.source="https://github.com/hagan-consulting/mock-pca" \
