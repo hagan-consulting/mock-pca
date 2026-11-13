@@ -17,7 +17,7 @@
 # Debian archive, whose signatures apt verifies.
 
 # golang:1.27.3-trixie as of 2026-10-21 (repo-info 7f748edf).
-FROM golang:1.27.3-trixie@sha256:fbb7ae40b62ff8afe31662df570d39b4f5052ac32b90dae8e60d7657a20a74f4 AS build
+FROM golang:1.27.3-trixie@sha256:af1bfc2614ebb1dbd31af514b78740fd678850e76498762b425ecee4c5c6ea80 AS build
 # Use exactly this toolchain (go.mod); never download another one. Standard
 # library only, so nothing is fetched from the module proxy either.
 ENV GOTOOLCHAIN=local CGO_ENABLED=0 GOFLAGS=-trimpath
