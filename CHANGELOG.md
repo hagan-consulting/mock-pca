@@ -5,8 +5,11 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-13
+
 ### Changed
 - Go 1.27.4 (`go.mod` and the container build image).
+- Container image: the Debian trixie-slim runtime base image is updated to its current digest.
 - `Dockerfile`: the base-image pin comments no longer name a date or repo-info commit, so Dependabot digest updates
   do not leave them stale.
 
@@ -68,6 +71,7 @@ First public release.
 - Contributor documentation: `CONTRIBUTING.md`, `SECURITY.md` (private vulnerability reporting), `CODE_OF_CONDUCT.md`
   (Contributor Covenant 2.1), issue forms, a pull request template and `CODEOWNERS`.
 
-[Unreleased]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Hagan-Consulting/mock-pca/releases/tag/v0.1.0
