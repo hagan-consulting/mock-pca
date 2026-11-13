@@ -16,8 +16,8 @@
 # proposes digest updates (7-day cooldown). Debian packages come from the
 # Debian archive, whose signatures apt verifies.
 
-# golang:1.27.3-trixie as of 2026-10-21 (repo-info 7f748edf).
-FROM golang:1.27.3-trixie@sha256:fbb7ae40b62ff8afe31662df570d39b4f5052ac32b90dae8e60d7657a20a74f4 AS build
+# golang:1.27.4-trixie as of 2026-11-10 (repo-info 2d1d058f).
+FROM golang:1.27.4-trixie@sha256:b54b2639de8c1bfe538ec5ffc45f29b1932235ac5f6d63c059853646677112d9 AS build
 # Use exactly this toolchain (go.mod); never download another one. Standard
 # library only, so nothing is fetched from the module proxy either.
 ENV GOTOOLCHAIN=local CGO_ENABLED=0 GOFLAGS=-trimpath

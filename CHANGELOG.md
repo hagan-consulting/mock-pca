@@ -5,6 +5,9 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+### Changed
+- Go 1.27.4 (`go.mod` and the container build image).
+
 ## [0.1.1] - 2026-11-04
 
 ### Changed
