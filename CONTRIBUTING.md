@@ -18,7 +18,7 @@ in public issues: see [SECURITY.md](SECURITY.md).
 
 | Tool | Version |
 |---|---|
-| Go | 1.27.3 (`go.mod`) |
+| Go | 1.27.4 (`go.mod`) |
 | OpenSSL | ≥ 3.0 (not LibreSSL) |
 | bash | ≥ 4.4 |
 | curl | any (end-to-end test) |

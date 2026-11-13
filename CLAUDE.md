@@ -12,7 +12,7 @@ interpretation). The normative source is the NG9-1-1 PKI Certificate Policy (CP)
   from software it is used to test; an independent implementation is the point (a shared bug would hide itself).
 - Certificates, CSRs and CRLs are produced by **OpenSSL ≥ 3.0** (`bin/mockpca`, `profiles/`). Go code (`cmd/`,
   `internal/`) only checks, serves and (later) answers OCSP; it never issues certificates.
-- Go 1.27.3, module `github.com/hagan-consulting/mock-pca`, **standard library only**. Adding any module (including
+- Go 1.27.4, module `github.com/hagan-consulting/mock-pca`, **standard library only**. Adding any module (including
   `golang.org/x/...`) needs the maintainers' approval first.
 - Never commit generated PKI material: private keys, CSRs, certificates, CRLs, `pki/` directories. `.gitignore`
   covers the defaults; test material is created in temporary directories at test time.

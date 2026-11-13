@@ -51,7 +51,7 @@ releases (see [CHANGELOG.md](CHANGELOG.md)).
 |---|---|---|
 | bash | ≥ 4.4 | macOS ships 3.2: install a current bash from a package manager |
 | OpenSSL | ≥ 3.0 | LibreSSL (macOS `/usr/bin/openssl`) is not supported; set `OPENSSL=/path/to/openssl` if needed |
-| Go | 1.27.3 (`go.mod`) | builds `mockpca-lint` and `mockpca-serve` from this checkout on first use |
+| Go | 1.27.4 (`go.mod`) | builds `mockpca-lint` and `mockpca-serve` from this checkout on first use |
 | curl | any | only for `scripts/e2e.sh` |
 
 Or use the [container image](#container), which needs only Docker.
