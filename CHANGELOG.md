@@ -7,6 +7,8 @@ All notable changes to this project are documented in this file. The format is b
 
 ### Changed
 - Go 1.27.4 (`go.mod` and the container build image).
+- `Dockerfile`: the base-image pin comments no longer name a date or repo-info commit, so Dependabot digest updates
+  do not leave them stale.
 
 ## [0.1.1] - 2026-11-04
 

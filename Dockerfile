@@ -10,13 +10,14 @@
 #   docker run --rm --init -v mockpca-pki:/pki -p 127.0.0.1:8080:8080 mock-pca:dev serve --listen 0.0.0.0:8080
 #
 # Supply chain (CLAUDE.md): base images are pinned by multi-arch index digest,
-# each one public for at least a week when adopted. Digests were taken from
-# the docker-library/repo-info history (repos/<image>/remote/<tag>.md) and
-# pulled from Docker Hub, which checks them against the content. Dependabot
-# proposes digest updates (7-day cooldown). Debian packages come from the
-# Debian archive, whose signatures apt verifies.
+# each one public for at least a week when adopted. A digest adopted by hand
+# is taken from the docker-library/repo-info history
+# (repos/<image>/remote/<tag>.md) and checked against Docker Hub; later digest
+# updates come from Dependabot (7-day cooldown) and are reviewed against Docker
+# Hub. Pulling by digest makes Docker check the content against it. Debian
+# packages come from the Debian archive, whose signatures apt verifies.
 
-# golang:1.27.4-trixie as of 2026-11-10 (repo-info 2d1d058f).
+# golang:1.27.4-trixie, multi-arch index digest (updated by Dependabot).
 FROM golang:1.27.4-trixie@sha256:b54b2639de8c1bfe538ec5ffc45f29b1932235ac5f6d63c059853646677112d9 AS build
 # Use exactly this toolchain (go.mod); never download another one. Standard
 # library only, so nothing is fetched from the module proxy either.
@@ -27,7 +28,7 @@ COPY cmd/ cmd/
 COPY internal/ internal/
 RUN go build -ldflags=-buildid= -o /out/ ./cmd/mockpca-lint ./cmd/mockpca-serve
 
-# debian:trixie-slim as of 2026-10-20 (repo-info 8561b0da).
+# debian:trixie-slim, multi-arch index digest (updated by Dependabot).
 FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
 LABEL org.opencontainers.image.title="mock-pca" \
       org.opencontainers.image.description="Development-only mock of the NG9-1-1 PCA PKI. NOT FOR PRODUCTION." \
