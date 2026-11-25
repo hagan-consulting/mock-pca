@@ -1200,7 +1200,7 @@ cmd_serve() {
 	((hours <= 48)) ||
 		note "WARNING: republishing CRLs every $((hours / 2)) hours exceeds CP Table 3 (a new CRL at least every 24 hours); allowed for testing"
 	kv_set "$PKI/pki.conf" crl_hours "$hours"
-	local serve pid sleeper=""
+	local serve pid tasks st=0
 	((nmin >= 1)) || die "--ocsp-nmin must be at least 1"
 	serve="${MOCKPCA_SERVE:-$(go_tool mockpca-serve)}"
 	resolve_lint
@@ -1208,20 +1208,40 @@ cmd_serve() {
 	cmd_crl --all
 	"$serve" -pki "$PKI" -listen "$listen" -openssl "$(command -v "$OPENSSL")" -nmin "$nmin" &
 	pid=$!
-	trap 'kill "$pid" $sleeper 2>/dev/null; wait "$pid" 2>/dev/null; exit 0' INT TERM
+	serve_tasks "$pid" "$hours" &
+	tasks=$!
+	trap 'kill "$pid" "$tasks" 2>/dev/null; wait "$pid" "$tasks" 2>/dev/null; exit 0' INT TERM
 	note "serving $PKI/www and OCSP on $listen; CRLs are republished every $((hours * 30)) minutes (half their lifetime)"
-	# CRLs are republished every half lifetime; responder certificates (30
-	# days, renewed within 7 days of expiry) are checked daily, whatever the
-	# CRL interval. Sleep until whichever is due first.
-	local crl_every=$((hours * 1800)) next_crl next_check
+	# Wait on mockpca-serve itself, so that serve ends as soon as it does (for
+	# example when its listen address is in use) and with its exit status. A
+	# wait on a given PID also returns the status of a child that has already
+	# exited; "wait -n" does not.
+	wait "$pid" || st=$?
+	kill "$tasks" 2>/dev/null || true
+	wait "$tasks" 2>/dev/null || true
+	return "$st"
+}
+
+# serve_tasks PID HOURS: serve's background job. Republishes the CRLs every
+# half lifetime (HOURS/2) and checks responder certificates (30 days, renewed
+# within 7 days of expiry) daily, whatever the CRL interval, until it gets
+# SIGTERM. If a task fails, it stops mockpca-serve (PID) so that serve does not
+# go on serving CRLs that are no longer republished.
+serve_tasks() {
+	local pid=$1 crl_every=$(($2 * 1800)) next_crl next_check sleeper=""
+	# SIGTERM ends the wait for the sleeper at once; during a task it is
+	# handled once the current command has finished.
+	trap 'kill $sleeper 2>/dev/null; exit 0' TERM
+	# The parent's pending paths are the parent's to remove.
+	CLEANUP=()
+	trap 'st=$?; cleanup; ((st == 0)) || { note "republishing failed; stopping the server"; kill "$pid" 2>/dev/null; }' EXIT
 	next_crl=$((SECONDS + crl_every))
 	next_check=$((SECONDS + SERVE_CHECK_EVERY))
-	while kill -0 "$pid" 2>/dev/null; do
+	while :; do
 		sleep "$(serve_wait "$SECONDS" "$next_crl" "$next_check")" </dev/null >/dev/null 2>&1 &
 		sleeper=$!
 		wait "$sleeper" || true
 		sleeper=""
-		kill -0 "$pid" 2>/dev/null || break
 		if ((SECONDS >= next_check)); then
 			refresh_responders
 			next_check=$((SECONDS + SERVE_CHECK_EVERY))
@@ -1231,7 +1251,6 @@ cmd_serve() {
 			next_crl=$((SECONDS + crl_every))
 		fi
 	done
-	wait "$pid"
 }
 
 # Seconds between responder certificate checks in serve.
