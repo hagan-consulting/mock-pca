@@ -1200,7 +1200,7 @@ cmd_serve() {
 	((hours <= 48)) ||
 		note "WARNING: republishing CRLs every $((hours / 2)) hours exceeds CP Table 3 (a new CRL at least every 24 hours); allowed for testing"
 	kv_set "$PKI/pki.conf" crl_hours "$hours"
-	local serve pid tasks st=0
+	local serve pid tasks st=0 tst=0
 	((nmin >= 1)) || die "--ocsp-nmin must be at least 1"
 	serve="${MOCKPCA_SERVE:-$(go_tool mockpca-serve)}"
 	resolve_lint
@@ -1218,15 +1218,19 @@ cmd_serve() {
 	# exited; "wait -n" does not.
 	wait "$pid" || st=$?
 	kill "$tasks" 2>/dev/null || true
-	wait "$tasks" 2>/dev/null || true
+	# A failed task stops mockpca-serve with SIGTERM, after which it exits 0:
+	# then the task job's status is serve's. After the SIGTERM above, the task
+	# job exits 0.
+	wait "$tasks" 2>/dev/null || tst=$?
+	((st)) || st=$tst
 	return "$st"
 }
 
 # serve_tasks PID HOURS: serve's background job. Republishes the CRLs every
 # half lifetime (HOURS/2) and checks responder certificates (30 days, renewed
 # within 7 days of expiry) daily, whatever the CRL interval, until it gets
-# SIGTERM. If a task fails, it stops mockpca-serve (PID) so that serve does not
-# go on serving CRLs that are no longer republished.
+# SIGTERM. If a task fails, it stops mockpca-serve (PID) and exits non-zero, so
+# that serve does not go on serving CRLs that are no longer republished.
 serve_tasks() {
 	local pid=$1 crl_every=$(($2 * 1800)) next_crl next_check sleeper=""
 	# SIGTERM ends the wait for the sleeper at once; during a task it is
@@ -1234,7 +1238,7 @@ serve_tasks() {
 	trap 'kill $sleeper 2>/dev/null; exit 0' TERM
 	# The parent's pending paths are the parent's to remove.
 	CLEANUP=()
-	trap 'st=$?; cleanup; ((st == 0)) || { note "republishing failed; stopping the server"; kill "$pid" 2>/dev/null; }' EXIT
+	trap 'st=$?; cleanup; ((st == 0)) || { note "a CRL republishing or responder check failed; stopping the server"; kill "$pid" 2>/dev/null; }' EXIT
 	next_crl=$((SECONDS + crl_every))
 	next_check=$((SECONDS + SERVE_CHECK_EVERY))
 	while :; do
