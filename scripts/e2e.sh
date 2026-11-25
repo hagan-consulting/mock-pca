@@ -209,6 +209,32 @@ curl -fsS -o /dev/null "http://127.0.0.1:$PORT/certs/pca.cer" || {
 	cat "$WORK/serve.log" >&2
 	fail "server did not start"
 }
+
+# exited_within SECONDS PID: whether PID exits within SECONDS (then reaped,
+# with its exit status in EXITED_STATUS).
+exited_within() {
+	local i
+	for ((i = 0; i < $1 * 5; i++)); do
+		if ! kill -0 "$2" 2>/dev/null; then
+			EXITED_STATUS=0
+			wait "$2" || EXITED_STATUS=$?
+			return 0
+		fi
+		sleep 0.2
+	done
+	return 1
+}
+
+step "serve exits when mockpca-serve does (listen address in use)"
+"$M" serve --listen "127.0.0.1:$PORT" 2>"$WORK/serve2.log" &
+pid=$!
+exited_within 30 "$pid" || {
+	kill "$pid" 2>/dev/null || true
+	cat "$WORK/serve2.log" >&2
+	fail "serve still running after mockpca-serve exited"
+}
+((EXITED_STATUS != 0)) || fail "serve exited with status 0 after mockpca-serve failed"
+grep -q 'address already in use' "$WORK/serve2.log" || fail "serve output: $(cat "$WORK/serve2.log")"
 for ee in "${EES[@]}"; do
 	cert="$PKI/ee/$ee/cert.pem"
 	ca="$(grep '^ca=' "$PKI/ee/$ee/ee.conf" | cut -d= -f2)"
@@ -448,5 +474,13 @@ expect_fail "verify with a stale CRL" "$M" verify --ee rbcf
 grep -q 'CRL has expired' "$WORK/out" || fail "verify output: $(cat "$WORK/out")"
 "$M" crl --ca region 2>/dev/null
 "$M" verify --ee rbcf >/dev/null
+
+step "serve stops on SIGTERM"
+kill -TERM "$SERVER_PID"
+exited_within 30 "$SERVER_PID" || fail "serve still running 30 s after SIGTERM"
+((EXITED_STATUS == 0)) || fail "serve exited with status $EXITED_STATUS after SIGTERM"
+SERVER_PID=""
+! curl -fsS -o /dev/null "http://127.0.0.1:$PORT/certs/pca.cer" 2>/dev/null ||
+	fail "mockpca-serve still serving after serve stopped"
 
 echo "OK"

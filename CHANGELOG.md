@@ -5,6 +5,11 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+### Fixed
+- `serve` exits as soon as `mockpca-serve` does (for example when the `--listen` address is in use), with its exit
+  status, instead of only at its next CRL republishing. A failed CRL republishing or responder check now stops the
+  server, and `serve` exits non-zero ([#19](https://github.com/hagan-consulting/mock-pca/issues/19)).
+
 ## [0.1.2] - 2026-11-13
 
 ### Changed
