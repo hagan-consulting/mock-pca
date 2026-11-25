@@ -5,6 +5,8 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-25
+
 ### Fixed
 - `serve` exits as soon as `mockpca-serve` does (for example when the `--listen` address is in use), with its exit
   status, instead of only at its next CRL republishing. A failed CRL republishing or responder check now stops the
@@ -76,7 +78,8 @@ First public release.
 - Contributor documentation: `CONTRIBUTING.md`, `SECURITY.md` (private vulnerability reporting), `CODE_OF_CONDUCT.md`
   (Contributor Covenant 2.1), issue forms, a pull request template and `CODEOWNERS`.
 
-[Unreleased]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Hagan-Consulting/mock-pca/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Hagan-Consulting/mock-pca/releases/tag/v0.1.0
