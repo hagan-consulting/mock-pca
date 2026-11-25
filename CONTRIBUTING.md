@@ -78,7 +78,8 @@ These keep the tool trustworthy as a test target. The full list, also used by co
 ## Releases
 
 Maintainers release by merging a pull request that moves the `## [Unreleased]` entries in CHANGELOG.md into a
-`## [X.Y.Z] - YYYY-MM-DD` section, then pushing a signed tag `vX.Y.Z` on that commit of `main`. CI
+`## [X.Y.Z] - YYYY-MM-DD` section, then pushing a lightweight tag `vX.Y.Z` on that commit of `main` and publishing a
+GitHub Release for it with the version's CHANGELOG section as notes. CI
 (`.github/workflows/ci.yml`) runs the checks on the tag and then `.github/workflows/publish-image.yml`, which
 publishes the container image for linux/amd64 and linux/arm64 to `ghcr.io/hagan-consulting/mock-pca` with a build
 provenance attestation. It refuses tags that are not on `main` or have no matching CHANGELOG section. Every push to
